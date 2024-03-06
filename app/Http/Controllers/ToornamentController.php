@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Redis;
 
 use App\Http\Requests\ToornamentRankTeam;
 use App\Http\Requests\ToornamentUniqueDivision;
@@ -69,6 +69,12 @@ class ToornamentController extends Controller
         $stageId = $validated['stage_ids'];
         $groupId = $validated['group_ids'];
 
+        $cache = Redis::get('rank' . $stageId);
+
+        if($cache){
+            return $cache;
+        }
+
         $response = Http::withHeaders([
             'X-Api-Key' => env('TOORNAMENT_API_KEY'),
             'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
@@ -81,6 +87,9 @@ class ToornamentController extends Controller
 
         if($response->successful()) {
             $matches = $response->json();
+
+            Redis::set('rank' . $stageId, $matches);
+            Redis::expire('rank' . $stageId, 43200);
 
             return $matches;
         } else {
