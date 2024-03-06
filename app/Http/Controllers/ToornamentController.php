@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
+use App\Http\Requests\ToornamentRankTeam;
+use App\Http\Requests\ToornamentUniqueDivision;
+use App\Http\Requests\ToornamentAllMatchDivision;
+
 class ToornamentController extends Controller
 {
     public function getMatches(){
@@ -59,14 +63,11 @@ class ToornamentController extends Controller
         }
     }
 
-    public function getRank(Request $request){
-        $tournamentId = $request->input('tournament_ids');
-        $stageId = $request->input('stage_ids');
-        $groupId = $request->input('group_ids');
-
-        if (!$tournamentId || !$stageId || !$groupId) {
-            return response()->json(['message' => 'Aucun paramètre a été reçu.'], 400);
-        }
+    public function getRank(ToornamentRankTeam $request){
+        $validated = $request->validated();
+        $tournamentId = $validated['tournament_ids'];
+        $stageId = $validated['stage_ids'];
+        $groupId = $validated['group_ids'];
 
         $response = Http::withHeaders([
             'X-Api-Key' => env('TOORNAMENT_API_KEY'),
@@ -89,12 +90,9 @@ class ToornamentController extends Controller
         }
     }
 
-    public function getUniqueDivision(Request $request){
-        $stageId = $request->input('stage_ids');
-
-        if(!$stageId) {
-            return response()->json(['message' => 'Aucun paramètre a été reçu.'], 400);
-        }
+    public function getUniqueDivision(ToornamentUniqueDivision $request){
+        $validated = $request->validated();
+        $stageId = $validated['stage_ids'];
 
         $response = Http::withHeaders([
             'X-Api-Key' => env('TOORNAMENT_API_KEY'),
@@ -116,12 +114,9 @@ class ToornamentController extends Controller
         }        
     }
 
-    public function getAllMatchFromDivision(Request $request){
-        $stageId = $request->input('stage_ids');
-
-        if(!$stageId) {
-            return response()->json(['message' => 'Aucun paramètre a été reçu.'], 400);
-        }
+    public function getAllMatchFromDivision(ToornamentAllMatchDivision $request){
+        $validated = $request->validated();
+        $stageId = $validated['stage_ids'];
 
         $response = Http::withHeaders([
             'X-Api-Key' => env('TOORNAMENT_API_KEY'),
