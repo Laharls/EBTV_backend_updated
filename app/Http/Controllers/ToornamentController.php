@@ -69,12 +69,11 @@ class ToornamentController extends Controller
         $stageId = $validated['stage_ids'];
         $groupId = $validated['group_ids'];
 
-        //$cache = Redis::get('rank' . $stageId);
+        $cache = Redis::get('rank' . $stageId);
 
-        //if($cache){
-        //    $matches = json_decode($cache, true); // Convert string to array
-        //    return response()->json($matches);
-        //}
+        if($cache){
+           return response()->json(json_decode($cache));
+        }
 
         $response = Http::withHeaders([
             'X-Api-Key' => env('TOORNAMENT_API_KEY'),
@@ -89,8 +88,8 @@ class ToornamentController extends Controller
         if($response->successful()) {
             $matches = $response->json();
 
-            //Redis::set('rank' . $stageId, $matches);
-            //Redis::expire('rank' . $stageId, 43200);
+            Redis::set('rank' . $stageId, json_encode($matches));
+            Redis::expire('rank' . $stageId, 43200);
 
             return $matches;
         } else {
