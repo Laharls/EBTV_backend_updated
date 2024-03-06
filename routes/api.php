@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\ToornamentController;
+use App\Http\Controllers\FullwipeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,12 +19,12 @@ use App\Http\Controllers\ToornamentController;
 //     return $request->user();
 // });
 
-Route::get('/hello', function(){
-    return response()->json(['message' => 'Hello World']);
-});
-
 Route::get('/toornament/matches', [ToornamentController::class, 'getMatches']);
 Route::get('toornament/groups', [ToornamentController::class, 'getGroups']);
 Route::get('/toornament/rank', [ToornamentController::class, 'getRank']);
 Route::get('toornament/sp3/s2/division', [ToornamentController::class, 'getUniqueDivision']);
 Route::get('toornament/sp3/s2/matches/', [ToornamentController::class, 'getAllMatchFromDivision']);
+
+Route::get('/fullwipe/teamMatch', [FullwipeController::class, 'getTeamMatch']);
+Route::get('/fullwipe/groupName', [FullwipeController::class, 'getGroupName']);
+Route::get('/fullwipe/roundName', [FullwipeController::class, 'getRoundName']);
