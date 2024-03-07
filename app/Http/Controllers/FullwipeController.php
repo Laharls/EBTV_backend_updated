@@ -52,6 +52,12 @@ class FullwipeController extends Controller
         $validated = $request->validated();
         $groupId = $validated['group_id'];
 
+        $cache = Redis::get('fullwipematch' . $groupId);
+
+        if($cache){
+            return response()->json($cache);
+        }
+
         $response = Http::withHeaders([
             'X-Api-Key' => env('TOORNAMENT_API_KEY'),
             'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
@@ -60,6 +66,10 @@ class FullwipeController extends Controller
         if ($response->successful()) {
             $group = $response->json();
             $groupName = $group['name'];
+
+            
+            Redis::set('fullwipe_group_name' . $groupId, $groupName);
+            Redis::expire('fullwipe_group_name' . $groupId, 300);
 
             return response()->json($groupName);
         } else {
