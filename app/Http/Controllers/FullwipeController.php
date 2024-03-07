@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Redis;
 
 use App\Http\Requests\FullwipeTeamMatch;
 use App\Http\Requests\FullwipeGroupName;
@@ -15,6 +16,12 @@ class FullwipeController extends Controller
     {
         $validated = $request->validated();
         $teamId = $validated['team_id'];
+
+        $cache = Redis::get('fullwipematch' . $teamId);
+
+        if($cache){
+            return response()->json(json_decode($cache));
+         }
 
         $response = Http::withHeaders([
             'X-Api-Key' => env('TOORNAMENT_API_KEY'),
@@ -28,6 +35,9 @@ class FullwipeController extends Controller
 
         if ($response->successful()) {
             $matches = $response->json();
+
+            Redis::set('fullwipematch' . $teamId, json_encode($matches));
+            Redis::expire('fullwipematch' . $teamId, 300);
 
             return $matches;
         } else {
