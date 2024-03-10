@@ -130,8 +130,17 @@ class FullwipeController extends Controller
                 return strpos($item['name'], 'Groupe') === 0;
             });
 
+            usort($filteredData, function ($a, $b) {
+                $numericA = intval(str_replace('Groupe ', '', $a['name']));
+                $numericB = intval(str_replace('Groupe ', '', $b['name']));
+                if ($numericA === $numericB) {
+                    return $a['number'] - $b['number'];
+                }
+                return $numericA - $numericB;
+            });
+
             // Reindex the array
-            $filteredData = array_values($filteredData);
+            //$filteredData = array_values($filteredData);
 
             // Convert the filtered array to JSON
             $jsonFilteredData = json_encode($filteredData, JSON_PRETTY_PRINT);
@@ -150,7 +159,7 @@ class FullwipeController extends Controller
         $stageId = $validated['stage_ids'];
         $groupId = $validated['group_ids'];
 
-        $cache = Redis::get('fullwipeRank' . $stageId);
+        $cache = Redis::get('fullwipeRank' . $groupId);
 
         if($cache){
            return response()->json(json_decode($cache));
@@ -169,8 +178,8 @@ class FullwipeController extends Controller
         if($response->successful()) {
             $matches = $response->json();
 
-            Redis::set('fullwipeRank' . $stageId, json_encode($matches));
-            Redis::expire('fullwipeRank' . $stageId, 43200);
+            Redis::set('fullwipeRank' . $groupId, json_encode($matches));
+            Redis::expire('fullwipeRank' . $groupId, 43200);
 
             return $matches;
         } else {
