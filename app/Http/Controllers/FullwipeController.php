@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Redis;
 use App\Http\Requests\FullwipeTeamMatch;
 use App\Http\Requests\FullwipeGroupName;
 use App\Http\Requests\FullwipeRoundName;
+use App\Http\Requests\ToornamentRankTeam;
 
 class FullwipeController extends Controller
 {
@@ -136,6 +137,42 @@ class FullwipeController extends Controller
             $jsonFilteredData = json_encode($filteredData, JSON_PRETTY_PRINT);
 
             return $jsonFilteredData;
+        } else {
+            $errorMessage = $response->json()["message"] ?? "Une erreur API est survenue";
+
+            return response()->json(['error' => $errorMessage], $response->status());
+        }
+    }
+
+    public function getRank(ToornamentRankTeam $request){
+        $validated = $request->validated();
+        $tournamentId = $validated['tournament_ids'];
+        $stageId = $validated['stage_ids'];
+        $groupId = $validated['group_ids'];
+
+        $cache = Redis::get('fullwipeRank' . $stageId);
+
+        if($cache){
+           return response()->json(json_decode($cache));
+        }
+
+        $response = Http::withHeaders([
+            'X-Api-Key' => env('TOORNAMENT_API_KEY'),
+            'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
+            'Range' => 'items=0-49'
+        ])->get("https://api.toornament.com/organizer/v2/ranking-items", [
+            'tournament_ids' => $tournamentId,
+            "stage_ids" => $stageId,
+            "group_ids" => $groupId
+        ]);
+
+        if($response->successful()) {
+            $matches = $response->json();
+
+            Redis::set('fullwipeRank' . $stageId, json_encode($matches));
+            Redis::expire('fullwipeRank' . $stageId, 43200);
+
+            return $matches;
         } else {
             $errorMessage = $response->json()["message"] ?? "Une erreur API est survenue";
 

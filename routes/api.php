@@ -27,5 +27,6 @@ Route::get('toornament/sp3/s2/matches/', [ToornamentController::class, 'getAllMa
 
 Route::get('/fullwipe/teamMatch', [FullwipeController::class, 'getTeamMatch']);
 Route::get('/fullwipe/groups', [FullwipeController::class, 'getFullwipeGroups']);
+Route::get('/fullwipe/rank', [FullwipeController::class, 'getRank']);
 Route::get('/fullwipe/groupName', [FullwipeController::class, 'getGroupName']);
 Route::get('/fullwipe/roundName', [FullwipeController::class, 'getRoundName']);
