@@ -111,4 +111,35 @@ class FullwipeController extends Controller
             return response()->json(['error' => $errorMessage], $response->status());
         }
     }
+
+    public function getFullwipeGroups(){
+        $response = Http::withHeaders([
+            'X-Api-Key' => env('TOORNAMENT_API_KEY'),
+            'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
+            'Range' => 'groups=0-49'
+        ])->get("https://api.toornament.com/organizer/v2/groups", [
+            'tournament_ids' => env("TOORNAMENT_FULLWIPE"),
+        ]);
+
+        if($response->successful()) {
+            $groups = $response->json();
+
+            // Filter out objects where the name property starts with "Division"
+            $filteredData = array_filter($groups, function ($item) {
+                return strpos($item['name'], 'Groupe') === 0;
+            });
+
+            // Reindex the array
+            $filteredData = array_values($filteredData);
+
+            // Convert the filtered array to JSON
+            $jsonFilteredData = json_encode($filteredData, JSON_PRETTY_PRINT);
+
+            return $jsonFilteredData;
+        } else {
+            $errorMessage = $response->json()["message"] ?? "Une erreur API est survenue";
+
+            return response()->json(['error' => $errorMessage], $response->status());
+        }
+    }
 }
