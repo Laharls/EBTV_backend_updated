@@ -146,4 +146,27 @@ class ToornamentController extends Controller
             return response()->json(['error' => $errorMessage], $response->status());
         }
     }
+
+    public function getComingMatches(){
+        $response = Http::withHeaders([
+            'X-Api-Key' => env('TOORNAMENT_API_KEY'),
+            'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
+            'Range' => 'matches=0-99'
+        ])->get("https://api.toornament.com/organizer/v2/matches", [
+            'tournament_ids' => env("TOORNAMENT_ID_S2"),
+            'statuses' => 'pending',
+            'is_scheduled' => '1',
+            'sort' => 'schedule'
+        ]);
+
+        if($response->successful()) {
+            $matches = $response->json();
+
+            return $matches;
+        } else {
+            $errorMessage = $response->json()["message"] ?? "Une erreur API est survenue";
+
+            return response()->json(['error' => $errorMessage], $response->status());
+        }
+    }
 }

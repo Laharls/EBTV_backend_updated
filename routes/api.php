@@ -22,6 +22,7 @@ use App\Http\Controllers\FullwipeController;
 Route::get('/toornament/matches', [ToornamentController::class, 'getMatches']);
 Route::get('toornament/groups', [ToornamentController::class, 'getGroups']);
 Route::get('/toornament/rank', [ToornamentController::class, 'getRank']);
+Route::get('/toornament/comingMatches', [ToornamentController::class, 'getComingMatches']);
 Route::get('toornament/sp3/s2/division', [ToornamentController::class, 'getUniqueDivision']);
 Route::get('toornament/sp3/s2/matches/', [ToornamentController::class, 'getAllMatchFromDivision']);
 
