@@ -24,6 +24,7 @@ Route::get('toornament/groups', [ToornamentController::class, 'getGroups']);
 Route::get('/toornament/rank', [ToornamentController::class, 'getRank']);
 Route::get('/toornament/comingMatches', [ToornamentController::class, 'getComingMatches']);
 Route::post('/toornament/streamMatches', [ToornamentController::class, 'getStreamMatch']);
+Route::get('/toornament/getVod', [ToornamentController::class,'getMatchesVideo']);
 Route::get('toornament/sp3/s2/division', [ToornamentController::class, 'getUniqueDivision']);
 Route::get('toornament/sp3/s2/matches/', [ToornamentController::class, 'getAllMatchFromDivision']);
 
