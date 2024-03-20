@@ -224,7 +224,7 @@ class ToornamentController extends Controller
         }
 
         Redis::set('streamMatch', json_encode($streamContent));
-        Redis::expire('streamMatch', 3600);
+        Redis::expire('streamMatch', 900);
 
         return response()->json($streamContent, $response->status());
     }
