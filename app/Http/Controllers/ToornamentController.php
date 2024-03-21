@@ -66,6 +66,44 @@ class ToornamentController extends Controller
         }
     }
 
+    public function getRankOptimized (Request $request){
+        // $validated = $request->validated();
+        // $tournamentId = $validated['tournament_ids'];
+        // $stageId = $validated['stage_ids'];
+        // $range = $validated['range'];
+
+        $tournamentId = $request->input('tournament_ids');
+        $stageId = $request->input('stage_ids');
+
+        // $cache = Redis::get('rank' . $stageId);
+
+        // if ($cache) {
+        //     return response()->json(json_decode($cache));
+        // }
+
+        $response = Http::withHeaders([
+            'X-Api-Key' => env('TOORNAMENT_API_KEY'),
+            'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
+            'Range' => 'items=0-49',
+        ])->get("https://api.toornament.com/organizer/v2/ranking-items", [
+                    'tournament_ids' => $tournamentId,
+                    "stage_ids" => $stageId,
+                ]);
+
+        if ($response->successful()) {
+            $matches = $response->json();
+
+            // Redis::set('rank' . $stageId, json_encode($matches));
+            // Redis::expire('rank' . $stageId, 43200);
+
+            return $matches;
+        } else {
+            $errorMessage = $response->json()["message"] ?? "Une erreur API est survenue";
+
+            return response()->json(['error' => $errorMessage], $response->status());
+        }
+    }
+
     public function getRank(ToornamentRankTeam $request)
     {
         $validated = $request->validated();
