@@ -20,7 +20,7 @@ class ToornamentController extends Controller
             'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
             'Range' => 'matches=0-99'
         ])->get("https://api.toornament.com/organizer/v2/matches", [
-                    'tournament_ids' => env("TOORNAMENT_ID_S2"),
+                    'tournament_ids' => env("TOORNAMENT_ID_S3"),
                 ]);
 
         if ($response->successful()) {
@@ -41,7 +41,7 @@ class ToornamentController extends Controller
             'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
             'Range' => 'groups=0-49'
         ])->get("https://api.toornament.com/organizer/v2/groups", [
-                    'tournament_ids' => env("TOORNAMENT_ID_S2"),
+                    'tournament_ids' => env("TOORNAMENT_ID_S3"),
                 ]);
 
         if ($response->successful()) {
@@ -111,11 +111,11 @@ class ToornamentController extends Controller
         $stageId = $validated['stage_ids'];
         $groupId = $validated['group_ids'];
 
-        $cache = Redis::get('rank' . $stageId);
+        // $cache = Redis::get('rank' . $stageId);
 
-        if ($cache) {
-            return response()->json(json_decode($cache));
-        }
+        // if ($cache) {
+        //     return response()->json(json_decode($cache));
+        // }
 
         $response = Http::withHeaders([
             'X-Api-Key' => env('TOORNAMENT_API_KEY'),
@@ -130,8 +130,8 @@ class ToornamentController extends Controller
         if ($response->successful()) {
             $matches = $response->json();
 
-            Redis::set('rank' . $stageId, json_encode($matches));
-            Redis::expire('rank' . $stageId, 43200);
+            // Redis::set('rank' . $stageId, json_encode($matches));
+            // Redis::expire('rank' . $stageId, 43200);
 
             return $matches;
         } else {
@@ -151,7 +151,7 @@ class ToornamentController extends Controller
             'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
             'Range' => 'items=0-49'
         ])->get("https://api.toornament.com/organizer/v2/ranking-items", [
-                    'tournament_ids' => env("TOORNAMENT_ID_S2"),
+                    'tournament_ids' => env("TOORNAMENT_ID_S3"),
                     "stage_ids" => $stageId,
                 ]);
 
@@ -176,7 +176,7 @@ class ToornamentController extends Controller
             'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
             'Range' => 'matches=0-99'
         ])->get("https://api.toornament.com/organizer/v2/matches", [
-                    'tournament_ids' => env("TOORNAMENT_ID_S2"),
+                    'tournament_ids' => env("TOORNAMENT_ID_S3"),
                     "stage_ids" => $stageId,
                 ]);
 
@@ -198,7 +198,7 @@ class ToornamentController extends Controller
             'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
             'Range' => 'matches=0-99'
         ])->get("https://api.toornament.com/organizer/v2/matches", [
-                    'tournament_ids' => env("TOORNAMENT_ID_S2"),
+                    'tournament_ids' => env("TOORNAMENT_ID_S3"),
                     'statuses' => 'pending',
                     'is_scheduled' => '1',
                     'sort' => 'schedule'
@@ -276,7 +276,7 @@ class ToornamentController extends Controller
             'Authorization' => env('TOORNAMENT_ACCESS_TOKEN'),
             'Range' => 'videos=0-49'
         ])->get("https://api.toornament.com/organizer/v2/videos", [
-                    'tournament_ids' => env("TOORNAMENT_ID_S2"),
+                    'tournament_ids' => env("TOORNAMENT_ID_S3"),
                     'match_ids' => $matchIds,
                     'category' => 'replay'
                 ]);
